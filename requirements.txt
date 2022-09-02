@@ -1,0 +1,3 @@
+pandas~=1.4.3
+githubdata~=4.0
+mirutil~=3.32
