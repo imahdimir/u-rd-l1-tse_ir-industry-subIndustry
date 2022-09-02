@@ -2,6 +2,9 @@
 venv
 .idea
 
+/raw-d-tse_ir-industry-subIndustry/
+
+
 # General
 .DS_Store
 **/.DS_Store
