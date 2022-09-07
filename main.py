@@ -7,15 +7,13 @@ from datetime import date
 
 import pandas as pd
 from githubdata import GithubData
-from mirutil import utils as mu
-from mirutil.df_utils import read_data_according_to_type as read_data
 from mirutil.df_utils import save_as_prq_wo_index as sprq
 
 
 class GDUrl :
-    src = 'https://github.com/imahdimir/rd-tse_ir-industry-subIndustry'
-    trg = 'https://github.com/imahdimir/d-tse_ir-industry-subIndustry'
-    cur = 'https://github.com/imahdimir/u-d-tse_ir-industry-subIndustry'
+    src = 'https://github.com/imahdimir/rd-l0-tse_ir-industry-subIndustry'
+    trg = 'https://github.com/imahdimir/rd-l1-tse_ir-industry-subIndustry'
+    cur = 'https://github.com/imahdimir/u-rd-l1-tse_ir-industry-subIndustry'
 
 gdu = GDUrl()
 
@@ -39,6 +37,7 @@ def main() :
     fp = gd_src.local_path / 'data.json'
     with open(fp , 'r') as f :
         data = json.load(f)
+
     ##
     dc = data['data']
     ##
@@ -86,26 +85,31 @@ def main() :
     ##
     dtr = gd_trg.read_data()
     ##
-    df1 = pd.concat([dtr , df] , ignore_index = True)
+    dtr = dtr.rename(
+            columns = {
+                    'Date' : c.obsd
+                    }
+            )
     ##
-    df1 = df1.sort_values('Date')
+    dtr = pd.concat([dtr , df] , ignore_index = True)
     ##
-    df1 = df1.drop_duplicates(subset = df1.columns.difference(['Date']))
+    dtr = dtr.sort_values(c.obsd , ascending = False)
     ##
-    sprq(df1 , fp)
+    dtr.drop_duplicates(inplace = True)
     ##
-    tokp = '/Users/mahdi/Dropbox/tok.txt'
-    tok = mu.get_tok_if_accessible(tokp)
+    sprq(dtr , fp)
+
     ##
-    msg = 'builded by: '
+    msg = 'data updated by: '
     msg += gdu.cur
     ##
-    gd_trg.commit_and_push(msg , user = gd_trg.user_name , token = tok)
+    gd_trg.commit_and_push(msg)
     ##
 
 
     gd_trg.rmdir()
     gd_src.rmdir()
+
 
     ##
 
